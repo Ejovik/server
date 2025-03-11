@@ -1,6 +1,8 @@
 package taskService
 
 import (
+	"strings"
+
 	"gorm.io/gorm"
 )
 
@@ -30,6 +32,12 @@ func (r *taskRepository) CreateTask(task Task) (Task, error) {
 func (r *taskRepository) GetAllTasks() ([]Task, error) {
 	var tasks []Task
 	err := r.db.Find(&tasks).Error
+	if err != nil {
+		if strings.Contains(err.Error(), `relation "tasks" does not exist`) {
+			return []Task{}, nil
+		}
+		return nil, err
+	}
 	return tasks, err
 }
 
