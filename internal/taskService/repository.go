@@ -47,7 +47,12 @@ func (r *taskRepository) UpdateTaskByID(id uint, task Task) (Task, error) {
 		return Task{}, err
 	}
 
-	if err := r.db.Model(&existingTask).Updates(task).Error; err != nil {
+	if task.Task != "" {
+		existingTask.Task = task.Task
+	}
+	existingTask.IsDone = task.IsDone
+
+	if err := r.db.Save(&existingTask).Error; err != nil {
 		return Task{}, err
 	}
 
