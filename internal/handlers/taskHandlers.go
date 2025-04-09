@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"project/internal/taskService"
 	"project/internal/web/tasks"
 )
@@ -14,19 +15,20 @@ func NewTaskHandler(service *taskService.TaskService) *TaskHandler {
 	return &TaskHandler{Service: service}
 }
 
-func (h *TaskHandler) GetTasks(_ context.Context, _ tasks.GetTasksRequestObject) (tasks.GetTasksResponseObject, error) {
-	allTasks, err := h.Service.GetAllTasks()
+func (h *TaskHandler) GetTasksUserId(ctx context.Context, request tasks.GetTasksUserIdRequestObject) (tasks.GetTasksUserIdResponseObject, error) {
+	userID := request.UserId
+	allTasks, err := h.Service.GetTasksByUserID(userID)
 	if err != nil {
 		return nil, err
 	}
 
-	response := tasks.GetTasks200JSONResponse{}
-
+	response := tasks.GetTasksUserId200JSONResponse{}
 	for _, tsk := range allTasks {
 		task := tasks.Task{
 			Id:     &tsk.ID,
 			Task:   &tsk.Task,
 			IsDone: &tsk.IsDone,
+			UserId: &tsk.UserID,
 		}
 		response = append(response, task)
 	}
@@ -39,15 +41,20 @@ func (h *TaskHandler) PostTasks(_ context.Context, request tasks.PostTasksReques
 		Task:   *taskRequest.Task,
 		IsDone: *taskRequest.IsDone,
 	}
-	createdTask, err := h.Service.CreateTask(taskToCreate)
+	if taskRequest.UserId == nil {
+		return nil, fmt.Errorf("user_id is required")
+	}
 
+	createdTask, err := h.Service.CreateTask(taskToCreate, *taskRequest.UserId)
 	if err != nil {
 		return nil, err
 	}
+
 	response := tasks.PostTasks201JSONResponse{
 		Id:     &createdTask.ID,
 		Task:   &createdTask.Task,
 		IsDone: &createdTask.IsDone,
+		UserId: &createdTask.UserID,
 	}
 	return response, nil
 }

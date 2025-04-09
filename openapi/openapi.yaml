@@ -4,19 +4,6 @@ info:
   version: 1.0.0
 paths:
   /tasks:
-    get:
-      summary: Get all tasks
-      tags:
-        - tasks
-      responses:
-        '200':
-          description: A list of tasks
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Task'
     post:
       summary: Create a task
       tags:
@@ -77,6 +64,28 @@ paths:
       responses:
         '204':
           description: Task successfully deleted
+  /tasks/{user_id}:
+    get:
+      summary: Get all tasks by user ID
+      tags:
+        - tasks
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: uint
+          description: The ID of the user
+      responses:
+        '200':
+          description: A list of tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
   /users:
     get:
       summary: Get all users
@@ -163,6 +172,10 @@ components:
           type: string
         is_done:
           type: boolean
+        user_id:
+          type: integer
+          format: uint
+          description: The ID of the user associated with the task
     User:
       type: object
       properties:

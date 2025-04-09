@@ -1,14 +1,12 @@
 package taskService
 
 import (
-	"strings"
-
 	"gorm.io/gorm"
 )
 
 type TaskRepository interface {
 	CreateTask(task Task) (Task, error)
-	GetAllTasks() ([]Task, error)
+	GetTasksByUserID(userID uint) ([]Task, error)
 	UpdateTaskByID(id uint, task Task) (Task, error)
 	DeleteTaskByID(id uint) error
 }
@@ -29,16 +27,13 @@ func (r *taskRepository) CreateTask(task Task) (Task, error) {
 	return task, nil
 }
 
-func (r *taskRepository) GetAllTasks() ([]Task, error) {
+func (r *taskRepository) GetTasksByUserID(userID uint) ([]Task, error) {
 	var tasks []Task
-	err := r.db.Find(&tasks).Error
+	err := r.db.Where("user_id = ?", userID).Find(&tasks).Error
 	if err != nil {
-		if strings.Contains(err.Error(), `relation "tasks" does not exist`) {
-			return []Task{}, nil
-		}
 		return nil, err
 	}
-	return tasks, err
+	return tasks, nil
 }
 
 func (r *taskRepository) UpdateTaskByID(id uint, task Task) (Task, error) {
