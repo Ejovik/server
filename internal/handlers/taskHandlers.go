@@ -15,14 +15,13 @@ func NewTaskHandler(service *taskService.TaskService) *TaskHandler {
 	return &TaskHandler{Service: service}
 }
 
-func (h *TaskHandler) GetTasksUserId(ctx context.Context, request tasks.GetTasksUserIdRequestObject) (tasks.GetTasksUserIdResponseObject, error) {
-	userID := request.UserId
-	allTasks, err := h.Service.GetTasksByUserID(userID)
+func (h *TaskHandler) GetTasks(ctx context.Context, request tasks.GetTasksRequestObject) (tasks.GetTasksResponseObject, error) {
+	allTasks, err := h.Service.GetAllTasks()
 	if err != nil {
 		return nil, err
 	}
 
-	response := tasks.GetTasksUserId200JSONResponse{}
+	response := tasks.GetTasks200JSONResponse{}
 	for _, tsk := range allTasks {
 		task := tasks.Task{
 			Id:     &tsk.ID,

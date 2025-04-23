@@ -6,7 +6,7 @@ import (
 
 type TaskRepository interface {
 	CreateTask(task Task) (Task, error)
-	GetTasksByUserID(userID uint) ([]Task, error)
+	GetAllTasks() ([]Task, error)
 	UpdateTaskByID(id uint, task Task) (Task, error)
 	DeleteTaskByID(id uint) error
 }
@@ -27,9 +27,9 @@ func (r *taskRepository) CreateTask(task Task) (Task, error) {
 	return task, nil
 }
 
-func (r *taskRepository) GetTasksByUserID(userID uint) ([]Task, error) {
+func (r *taskRepository) GetAllTasks() ([]Task, error) {
 	var tasks []Task
-	err := r.db.Where("user_id = ?", userID).Find(&tasks).Error
+	err := r.db.Find(&tasks).Error
 	if err != nil {
 		return nil, err
 	}
